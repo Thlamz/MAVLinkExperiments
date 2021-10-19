@@ -7,49 +7,10 @@
 #include <boost/stacktrace.hpp>
 
 #include "message_checkers.hpp"
-#include "requirement.hpp"
+#include "mavlink_helper.hpp"
 
 using namespace boost::asio;
 using boost::asio::ip::udp;
-
-class MAVLinkHelper {
-    public:
-        MAVLinkHelper(uint8_t system_id, uint8_t component_id, int input_port, int output_port) : system_id(system_id), component_id(component_id) {
-            socket.open(udp::v4());
-            local_port = udp::endpoint(udp::v4(), input_port);
-            socket.bind(local_port);
-            remote_port = *resolver.resolve(udp::v4(), "127.0.0.1", std::to_string(output_port)).begin();
-        }
-        ~MAVLinkHelper() {
-            socket.close();
-        }
-
-        void add_requirement(requirement *req, std::function<void()> resume) {
-            requirement = req;
-            completer = resume;
-        }
-
-        void check_requirements(mavlink_message_t msg) {
-            if(requirement->condition(msg)) {
-                completer();
-            }
-        }
-
-    public:
-        uint8_t system_id;
-        uint8_t component_id;
-        io_context io;
-        udp::resolver resolver = udp::resolver(io);
-        udp::socket socket = udp::socket(io);
-        udp::endpoint local_port;
-        udp::endpoint remote_port;
-
-    
-    private:
-        boost::array<uint8_t, 265> buf;
-        requirement *requirement;
-        std::function<void()> completer;
-};
 
 struct telemetry_routine : coroutine {
     std::shared_ptr<MAVLinkHelper> helper;

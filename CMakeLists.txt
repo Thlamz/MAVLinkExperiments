@@ -8,7 +8,7 @@ link_directories("H:\\Installs\\Ferramentas\\boost_1_77_0\\stage\\lib")
 
 enable_testing()
 
-add_executable(MAVTest main.cpp requirement.hpp message_checkers.cpp)
+add_executable(MAVTest main.cpp message_checkers.cpp mavlink_helper.cpp)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
