@@ -3,6 +3,9 @@
 #include <ardupilotmega/mavlink.h>
 #include "requirement.hpp"
 
+#ifndef MAVLINKHELPER_HEADER
+#define MAVLINKHELPER_HEADER
+
 class MAVLinkHelper {
     public:
         MAVLinkHelper(uint8_t system_id, uint8_t component_id, int input_port, int output_port);
@@ -28,3 +31,5 @@ class MAVLinkHelper {
         requirement *current_requirement;
         std::function<void()> completer;
 };
+
+#endif
