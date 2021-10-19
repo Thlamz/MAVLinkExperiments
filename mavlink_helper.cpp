@@ -1,5 +1,7 @@
 #include "mavlink_helper.hpp"
 
+using namespace boost::asio;
+using boost::asio::ip::udp;
 
 MAVLinkHelper::MAVLinkHelper(uint8_t system_id, uint8_t component_id, int input_port, int output_port) : system_id(system_id), component_id(component_id) {
     socket.open(udp::v4());

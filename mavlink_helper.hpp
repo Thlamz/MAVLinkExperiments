@@ -3,9 +3,6 @@
 #include <ardupilotmega/mavlink.h>
 #include "requirement.hpp"
 
-using namespace boost::asio;
-using boost::asio::ip::udp;
-
 class MAVLinkHelper {
     public:
         MAVLinkHelper(uint8_t system_id, uint8_t component_id, int input_port, int output_port);
@@ -18,11 +15,11 @@ class MAVLinkHelper {
     public:
         uint8_t system_id;
         uint8_t component_id;
-        io_context io;
-        udp::resolver resolver = udp::resolver(io);
-        udp::socket socket = udp::socket(io);
-        udp::endpoint local_port;
-        udp::endpoint remote_port;
+        boost::asio::io_context io;
+        boost::asio::ip::udp::resolver resolver = boost::asio::ip::udp::resolver(io);
+        boost::asio::ip::udp::socket socket = boost::asio::ip::udp::socket(io);
+        boost::asio::ip::udp::endpoint local_port;
+        boost::asio::ip::udp::endpoint remote_port;
 
     
     private:
