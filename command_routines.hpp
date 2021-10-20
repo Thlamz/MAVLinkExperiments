@@ -9,11 +9,11 @@
 
 class CommandRoutine : public boost::asio::coroutine {
     public:
-        CommandRoutine(MAVLinkHelper& mavlink_helper) : helper(mavlink_helper) {};
+        CommandRoutine(std::shared_ptr<MAVLinkHelper>& mavlink_helper) : helper(mavlink_helper) {};
         void operator()(boost::system::error_code ec = boost::system::error_code(), std::size_t n = 0);
 
     private:
-        MAVLinkHelper &helper;
+        std::shared_ptr<MAVLinkHelper>& helper;
         boost::array<uint8_t, 256> buf;
         size_t len;
         

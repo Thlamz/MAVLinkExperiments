@@ -17,13 +17,13 @@ void CommandRoutine::operator()(boost::system::error_code ec, std::size_t n) {
             cmd.target_component = 1;
             cmd.target_system = 1;
             mavlink_message_t msg; 
-            mavlink_msg_command_long_encode(helper.system_id, helper.component_id, &msg, &cmd);
+            mavlink_msg_command_long_encode(helper->system_id, helper->component_id, &msg, &cmd);
             len = mavlink_msg_to_send_buffer(buf.data(), &msg);
 
-            yield helper.socket.async_send_to(buffer(buf, len), helper.remote_port, *this);
+            yield helper->socket.async_send_to(buffer(buf, len), helper->remote_port, *this);
 
 
-            yield helper.add_requirement(new requirement(check_pre_arm), *this);
+            yield helper->add_requirement(new requirement(check_pre_arm), *this);
             
             
 
@@ -35,11 +35,11 @@ void CommandRoutine::operator()(boost::system::error_code ec, std::size_t n) {
             cmd.param1 = 1;
             cmd.target_component = 1;
             cmd.target_system = 1;
-            mavlink_msg_command_long_encode(helper.system_id, helper.component_id, &msg, &cmd);
+            mavlink_msg_command_long_encode(helper->system_id, helper->component_id, &msg, &cmd);
             len = mavlink_msg_to_send_buffer(buf.data(), &msg);
 
-            yield helper.socket.async_send_to(buffer(buf, len), helper.remote_port, *this);
-            yield helper.add_requirement(new requirement(check_arm), *this);
+            yield helper->socket.async_send_to(buffer(buf, len), helper->remote_port, *this);
+            yield helper->add_requirement(new requirement(check_arm), *this);
 
 
             std::cout << "Sending TAKEOFF" << std::endl;
@@ -50,10 +50,10 @@ void CommandRoutine::operator()(boost::system::error_code ec, std::size_t n) {
             cmd.param7 = 25;
             cmd.target_component = 1;
             cmd.target_system = 1;
-            mavlink_msg_command_long_encode(helper.system_id, helper.component_id, &msg, &cmd);
+            mavlink_msg_command_long_encode(helper->system_id, helper->component_id, &msg, &cmd);
             len = mavlink_msg_to_send_buffer(buf.data(), &msg);
 
-            yield helper.socket.async_send_to(buffer(buf, len), helper.remote_port, *this);
+            yield helper->socket.async_send_to(buffer(buf, len), helper->remote_port, *this);
         };
     }
 }

@@ -9,10 +9,10 @@
 
 class TelemetryRoutine : public boost::asio::coroutine {
     public:
-        TelemetryRoutine(MAVLinkHelper &mavlink_helper) : helper(mavlink_helper) {}; 
+        TelemetryRoutine(std::shared_ptr<MAVLinkHelper>& mavlink_helper) : helper(mavlink_helper) {}; 
         void operator()(boost::system::error_code ec = boost::system::error_code(), std::size_t len = 0);
     private:
-        MAVLinkHelper &helper;
+        std::shared_ptr<MAVLinkHelper>& helper;
         boost::array<uint8_t, 256> *buf = new boost::array<uint8_t, 256>();
 };
 

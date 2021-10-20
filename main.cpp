@@ -18,10 +18,10 @@ int main(void) {
     try {
         std::shared_ptr<MAVLinkHelper> helper = std::make_shared<MAVLinkHelper>(203, 200, 5605, 5505);
 
-        TelemetryRoutine telemetry_routine(*helper);
+        TelemetryRoutine telemetry_routine(helper);
         telemetry_routine();
 
-        CommandRoutine command_routine(*helper);
+        CommandRoutine command_routine(helper);
         command_routine();
 
         helper->io.run();
