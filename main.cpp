@@ -2,7 +2,6 @@
 #include <queue>
 #include <ardupilotmega/mavlink.h>
 #include <boost/asio.hpp>
-#include <boost/asio/yield.hpp>
 #include <boost/array.hpp>
 #include <boost/stacktrace.hpp>
 
@@ -21,8 +20,8 @@ int main(void) {
         TelemetryRoutine telemetry_routine(helper);
         telemetry_routine();
 
-        CommandRoutine command_routine(helper);
-        command_routine();
+        MainCommandRoutine command_routine(helper);
+        spawn(helper->io, command_routine);
 
         helper->io.run();
     } catch(std::exception &error) {

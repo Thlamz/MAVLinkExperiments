@@ -1,4 +1,5 @@
 #include "mavlink_helper.hpp"
+#include <iostream>
 
 using namespace boost::asio;
 using boost::asio::ip::udp;
@@ -14,13 +15,15 @@ MAVLinkHelper::~MAVLinkHelper() {
 }
 
 void MAVLinkHelper::check_requirements(mavlink_message_t msg) {
-    if(current_requirement->condition(msg)) {
+    if(!current_condition_resolved && current_condition(msg)) {
+        current_condition_resolved = true;
         completer();
     }
 }
 
 
-void MAVLinkHelper::add_requirement(requirement *req, std::function<void()> resume) {
-    current_requirement = req;
+void MAVLinkHelper::add_requirement(Condition cond, std::function<void()> resume) {
+    current_condition = cond;
     completer = resume;
+    current_condition_resolved = false;
 }
