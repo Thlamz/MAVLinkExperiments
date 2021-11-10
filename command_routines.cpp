@@ -1,14 +1,17 @@
 #include "command_routines.hpp"
 #include "message_checkers.hpp"
 #include "requirement.hpp"
+#include <iostream>
 
 using namespace boost::asio;
 using boost::asio::ip::udp;
 
 void MainCommandRoutine::operator()(boost::asio::yield_context yield) {
+    boost::system::error_code ec;
     boost::array<uint8_t, 256> buf;
     size_t len;
-
+    steady_timer* command_timeout = new steady_timer(helper->io);
+    
     std::cout << "Sending GUIDED" << std::endl;
     // Sending MODE GUIDED command
     mavlink_command_long_t cmd;
@@ -22,9 +25,14 @@ void MainCommandRoutine::operator()(boost::asio::yield_context yield) {
     mavlink_msg_command_long_encode(helper->system_id, helper->component_id, &msg, &cmd);
     len = mavlink_msg_to_send_buffer(buf.data(), &msg);
 
-    len = helper->socket.async_send_to(buffer(buf, len), helper->remote_port, yield);
-    async_requirement(check_pre_arm, helper, yield);
     
+    len = helper->socket.async_send_to(buffer(buf, len), helper->remote_port, yield);
+
+    async_requirement(check_pre_arm, helper, yield[ec], 5, command_timeout);
+    
+    if(ec) {
+        std::cout << "TIMED OUT" << std::endl;
+    }
     
 
     std::cout << "Sending ARM THROTTLE" << std::endl;

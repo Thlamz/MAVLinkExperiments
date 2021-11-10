@@ -14,7 +14,9 @@ class MAVLinkHelper {
 
         void add_requirement(Condition cond, std::function<void()> resume);
 
-        void check_requirements(mavlink_message_t msg);
+        void check_requirement(mavlink_message_t msg);
+
+        void cancel_requirement();
 
     public:
         uint8_t system_id;

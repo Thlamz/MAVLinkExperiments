@@ -14,16 +14,21 @@ MAVLinkHelper::~MAVLinkHelper() {
     socket.close();
 }
 
-void MAVLinkHelper::check_requirements(mavlink_message_t msg) {
+void MAVLinkHelper::add_requirement(Condition cond, std::function<void()> resume) {
+    current_condition = cond;
+    completer = resume;
+    current_condition_resolved = false;
+}
+
+void MAVLinkHelper::check_requirement(mavlink_message_t msg) {
     if(!current_condition_resolved && current_condition(msg)) {
         current_condition_resolved = true;
         completer();
     }
 }
 
-
-void MAVLinkHelper::add_requirement(Condition cond, std::function<void()> resume) {
-    current_condition = cond;
-    completer = resume;
-    current_condition_resolved = false;
+void MAVLinkHelper::cancel_requirement() {
+    if(!current_condition_resolved) {
+        current_condition_resolved = true;
+    }
 }

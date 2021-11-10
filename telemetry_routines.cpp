@@ -16,7 +16,7 @@ void TelemetryRoutine::operator()(boost::system::error_code ec, std::size_t len)
                     {
                         if (mavlink_parse_char(MAVLINK_COMM_0, (*buf)[i], &msg, &status))
                         {
-                            helper->check_requirements(msg);
+                            helper->check_requirement(msg);
                         }
                     }
             }
