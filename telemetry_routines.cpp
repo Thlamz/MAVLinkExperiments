@@ -1,4 +1,5 @@
 #include "telemetry_routines.hpp"
+#include <iostream>
 
 using namespace boost::asio;
 using boost::asio::ip::udp;

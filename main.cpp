@@ -15,7 +15,7 @@ using boost::asio::ip::udp;
 
 int main(void) {
     try {
-        std::shared_ptr<MAVLinkHelper> helper = std::make_shared<MAVLinkHelper>(203, 200, 5605, 5505);
+        std::shared_ptr<MAVLinkHelper> helper = std::make_shared<MAVLinkHelper>(203, 200, 5505);
 
         TelemetryRoutine telemetry_routine(helper);
         telemetry_routine();

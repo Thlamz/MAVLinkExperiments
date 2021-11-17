@@ -10,8 +10,6 @@ bool check_pre_arm(mavlink_message_t message) {
                     
     uint16_t error_bits = (ESTIMATOR_CONST_POS_MODE |
                 ESTIMATOR_ACCEL_ERROR);
-
-    
     if(message.msgid == MAVLINK_MSG_ID_EKF_STATUS_REPORT) {
         mavlink_ekf_status_report_t report;
         mavlink_msg_ekf_status_report_decode(&message, &report);

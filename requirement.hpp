@@ -32,8 +32,10 @@ void async_requirement(Condition cond, std::shared_ptr<MAVLinkHelper> helper, To
 
         timer->expires_after(std::chrono::seconds(timeout));
         timer->async_wait([&helper, completer = std::function<void (boost::system::error_code)>(handler)](const boost::system::error_code& ec) {
-            helper->cancel_requirement();
-            completer(boost::asio::error::timed_out);
+            if(!ec) {
+                helper->cancel_requirement();
+                completer(boost::asio::error::timed_out);
+            }
         });
     }
 

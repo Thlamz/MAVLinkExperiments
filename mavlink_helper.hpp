@@ -9,7 +9,7 @@ typedef std::function<bool(mavlink_message_t)> Condition;
 
 class MAVLinkHelper {
     public:
-        MAVLinkHelper(uint8_t system_id, uint8_t component_id, int input_port, int output_port);
+        MAVLinkHelper(uint8_t system_id, uint8_t component_id, int port);
         ~MAVLinkHelper();
 
         void add_requirement(Condition cond, std::function<void()> resume);
@@ -33,7 +33,7 @@ class MAVLinkHelper {
         
         Condition current_condition;
         std::function<void()> completer;
-        bool current_condition_resolved = false;
+        bool current_condition_resolved = true;
 };
 
 #endif
