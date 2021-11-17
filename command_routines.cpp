@@ -21,7 +21,7 @@ void MainCommandRoutine::operator()(boost::asio::yield_context yield) {
     mavlink_message_t msg; 
     mavlink_msg_command_long_encode(helper->system_id, helper->component_id, &msg, &cmd);
 
-    async_send_message(msg, check_pre_arm, yield, 5);
+    async_send_message(msg, check_pre_arm, yield, 5, 3);
     
     std::cout << "Sending ARM THROTTLE" << std::endl;
     // Sending ARM THROTTLE command
@@ -52,17 +52,31 @@ void MainCommandRoutine::operator()(boost::asio::yield_context yield) {
     std::cout << "DONE" << std::endl;
 }
 
-inline boost::system::error_code MainCommandRoutine::async_send_message(mavlink_message_t msg, Condition requirement, boost::asio::yield_context yield, int timeout) {
+inline boost::system::error_code MainCommandRoutine::async_send_message(mavlink_message_t msg, Condition requirement, boost::asio::yield_context yield, 
+                                                                            int timeout, int retries) {
     boost::system::error_code ec;
-    boost::array<uint8_t, 256> buf;
-    len = mavlink_msg_to_send_buffer(buf.data(), &msg);
-    len = helper->socket.async_send_to(buffer(buf, len), helper->remote_port, yield);
+    int tries = 0;
+    do {
+        ec.clear();
+        tries++;
 
-    async_requirement(requirement, helper, yield[ec], 5, command_timeout);
-    command_timeout->cancel();
-    
-    if(ec) {
-        std::cout << "TIMED OUT" << std::endl;
-    }
+        if(tries > 1) {
+            std::cout << "RETRYING" << std::endl;
+        }
+
+        len = mavlink_msg_to_send_buffer(buf.data(), &msg);
+        len = helper->socket.async_send_to(buffer(buf, len), helper->remote_port, yield);
+        if(ec) {
+            std::cout << "REQUEST FAILED" << std::endl;
+            continue;
+        }
+
+        async_requirement(requirement, helper, yield[ec], 5, command_timeout);
+        command_timeout->cancel();
+        
+        if(ec) {
+            std::cout << "TIMED OUT" << std::endl;
+        }
+    } while(ec && tries < retries);
     return ec;
 }

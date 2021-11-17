@@ -22,13 +22,15 @@ class MainCommandRoutine : public boost::asio::coroutine {
          * called with every oncoming telemetry to check for the requirement's completion
          * @param yield Yield context of the stackful coroutine
          * @param timeout Optional timeout in seconds. After this time the requirement will complete regardless of any telemetry recieved
+         * @param retries Optional number of retries for the message
          * @return boost::system::error_code 
          */
-        boost::system::error_code async_send_message(mavlink_message_t msg, Condition requirement, boost::asio::yield_context yield, int timeout = -1);
+        boost::system::error_code async_send_message(mavlink_message_t msg, Condition requirement, boost::asio::yield_context yield, int timeout = -1, int retries = -1);
 
     protected:
         std::shared_ptr<MAVLinkHelper>& helper;
         size_t len;
+        boost::array<uint8_t, 256> buf;
         boost::asio::steady_timer* command_timeout;
 };
 
