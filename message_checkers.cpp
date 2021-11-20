@@ -1,6 +1,22 @@
 #include "message_checkers.hpp"
 #include <iostream>
 
+bool check_empty(mavlink_message_t) {
+    return true;
+}
+
+Condition get_check_cmd_ack(uint16_t command) {
+    return [command](mavlink_message_t message) {
+        if(message.msgid = MAVLINK_MSG_ID_COMMAND_ACK) {
+            mavlink_command_ack_t ack;
+            mavlink_msg_command_ack_decode(&message, &ack);
+            if(ack.command == command) {
+                return true;
+            }
+        }
+    };
+}
+
 bool check_pre_arm(mavlink_message_t message) {
     uint16_t required_value = (EKF_ATTITUDE |
                 ESTIMATOR_VELOCITY_HORIZ |

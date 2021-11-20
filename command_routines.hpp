@@ -15,7 +15,7 @@ class MainCommandRoutine : public boost::asio::coroutine {
         void operator()(boost::asio::yield_context yield);
 
         /**
-         * @brief Asyncronously sends a message and sets a requirement with an optional timeout.
+         * @brief Asyncronously sends a message and sets a requirement with an optional timeout. Always waits for COMMAND_ACK
          * 
          * @param msg MAVLink message to send
          * @param requirement Requirement for the message's completion. This is a function that will be 
@@ -25,7 +25,7 @@ class MainCommandRoutine : public boost::asio::coroutine {
          * @param retries Optional number of retries for the message
          * @return boost::system::error_code 
          */
-        boost::system::error_code async_send_message(mavlink_message_t msg, Condition requirement, boost::asio::yield_context yield, int timeout = -1, int retries = -1);
+        boost::system::error_code async_send_command(mavlink_command_long_t cmd, Condition requirement, boost::asio::yield_context yield, int timeout = -1, int retries = -1);
 
     protected:
         std::shared_ptr<MAVLinkHelper>& helper;

@@ -8,20 +8,27 @@ using boost::asio::ip::udp;
 
 void MainCommandRoutine::operator()(boost::asio::yield_context yield) {
     boost::system::error_code ec;
+    mavlink_command_long_t cmd;
+
+    std::cout << "Setting STREAM RATE" << std::endl;
+    cmd = {};
+    cmd.command = MAV_CMD_SET_MESSAGE_INTERVAL;
+    cmd.confirmation = 0;
+    cmd.param1 = 10; // 10Hz
+    cmd.target_component = 1;
+    cmd.target_system = 1;
+    async_send_command(cmd, check_empty, yield, 5, 3);
 
     std::cout << "Sending GUIDED" << std::endl;
     // Sending MODE GUIDED command
-    mavlink_command_long_t cmd;
+    cmd = {};
     cmd.command = MAV_CMD_DO_SET_MODE;
     cmd.confirmation = 0;
     cmd.param1 = MAV_MODE_FLAG_CUSTOM_MODE_ENABLED;
     cmd.param2 = COPTER_MODE_GUIDED;
     cmd.target_component = 1;
     cmd.target_system = 1;
-    mavlink_message_t msg; 
-    mavlink_msg_command_long_encode(helper->system_id, helper->component_id, &msg, &cmd);
-
-    async_send_message(msg, check_pre_arm, yield, 5, 3);
+    async_send_command(cmd, check_pre_arm, yield, 5, 3);
     
     std::cout << "Sending ARM THROTTLE" << std::endl;
     // Sending ARM THROTTLE command
@@ -31,9 +38,7 @@ void MainCommandRoutine::operator()(boost::asio::yield_context yield) {
     cmd.param1 = 1;
     cmd.target_component = 1;
     cmd.target_system = 1;
-    mavlink_msg_command_long_encode(helper->system_id, helper->component_id, &msg, &cmd);
-
-    async_send_message(msg, check_arm, yield, 5);
+    async_send_command(cmd, check_arm, yield, 5);
 
 
 
@@ -45,16 +50,18 @@ void MainCommandRoutine::operator()(boost::asio::yield_context yield) {
     cmd.param7 = 25;
     cmd.target_component = 1;
     cmd.target_system = 1;
-    mavlink_msg_command_long_encode(helper->system_id, helper->component_id, &msg, &cmd);
-    
-    async_send_message(msg, check_arm, yield, 5);
+    async_send_command(cmd, check_arm, yield, 5);
 
     std::cout << "DONE" << std::endl;
 }
 
-inline boost::system::error_code MainCommandRoutine::async_send_message(mavlink_message_t msg, Condition requirement, boost::asio::yield_context yield, 
+inline boost::system::error_code MainCommandRoutine::async_send_command(mavlink_command_long_t cmd, Condition requirement, boost::asio::yield_context yield, 
                                                                             int timeout, int retries) {
     boost::system::error_code ec;
+    mavlink_message_t msg;
+
+    mavlink_msg_command_long_encode(helper->system_id, helper->component_id, &msg, &cmd);
+
     int tries = 0;
     do {
         ec.clear();
@@ -71,7 +78,19 @@ inline boost::system::error_code MainCommandRoutine::async_send_message(mavlink_
             continue;
         }
 
-        async_requirement(requirement, helper, yield[ec], 5, command_timeout);
+        Condition check_ack = get_check_cmd_ack(cmd.command);
+
+        bool ack_checked = false;
+        bool requirement_checked = false;
+        async_requirement([&](mavlink_message_t msg) {
+            if(check_ack(msg)) {
+                ack_checked = true;
+            }
+            if(requirement(msg)) {
+                requirement_checked = true;
+            }
+            return ack_checked && requirement_checked;
+        }, helper, yield[ec], 5, command_timeout);
         command_timeout->cancel();
         
         if(ec) {
