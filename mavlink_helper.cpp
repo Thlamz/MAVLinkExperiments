@@ -6,9 +6,13 @@ using boost::asio::ip::udp;
 
 MAVLinkHelper::MAVLinkHelper(uint8_t system_id, uint8_t component_id, int port) : system_id(system_id), component_id(component_id) {
     socket.open(udp::v4());
-    local_port = udp::endpoint(udp::v4(), 2433);
+    local_port = udp::endpoint(udp::v4(), port);
     socket.bind(local_port);
-    remote_port = *resolver.resolve(udp::v4(), "127.0.0.1", std::to_string(5505)).begin();
+
+    // Resolving remote port
+    std::cout << "Resolving port" << std::endl;
+    boost::array<uint8_t, 256> array;
+    socket.receive_from(buffer(array), remote_port);
 }
 MAVLinkHelper::~MAVLinkHelper() {
     socket.close();

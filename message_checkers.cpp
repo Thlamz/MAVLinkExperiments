@@ -14,6 +14,7 @@ Condition get_check_cmd_ack(uint16_t command) {
                 return true;
             }
         }
+        return false;
     };
 }
 
@@ -44,4 +45,15 @@ bool check_arm(mavlink_message_t message) {
         return (heartbeat.base_mode & MAV_MODE_FLAG_SAFETY_ARMED);
     }
     return false;
+}
+
+Condition get_check_altitude(int32_t altitude, int32_t tolerance) {
+    return [=](mavlink_message_t msg) {
+        if(msg.msgid == MAVLINK_MSG_ID_GLOBAL_POSITION_INT) {
+            mavlink_global_position_int_t position;
+            mavlink_msg_global_position_int_decode(&msg, &position);
+            return abs(position.relative_alt / 1000 - altitude) < tolerance;
+        }
+        return false;
+    };
 }

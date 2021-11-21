@@ -50,7 +50,7 @@ void MainCommandRoutine::operator()(boost::asio::yield_context yield) {
     cmd.param7 = 25;
     cmd.target_component = 1;
     cmd.target_system = 1;
-    async_send_command(cmd, check_arm, yield, 5);
+    async_send_command(cmd, get_check_altitude(25, 2), yield);
 
     std::cout << "DONE" << std::endl;
 }
@@ -90,7 +90,7 @@ inline boost::system::error_code MainCommandRoutine::async_send_command(mavlink_
                 requirement_checked = true;
             }
             return ack_checked && requirement_checked;
-        }, helper, yield[ec], 5, command_timeout);
+        }, helper, yield[ec], timeout, command_timeout);
         command_timeout->cancel();
         
         if(ec) {
