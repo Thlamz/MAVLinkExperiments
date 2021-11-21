@@ -18,7 +18,7 @@ int main(void) {
         std::shared_ptr<MAVLinkHelper> helper = std::make_shared<MAVLinkHelper>(255, MAV_COMP_ID_MISSIONPLANNER, 14550);
 
         TelemetryRoutine telemetry_routine(helper);
-        telemetry_routine();
+        spawn(helper->io, telemetry_routine);
 
         MainCommandRoutine command_routine(helper);
         spawn(helper->io, command_routine);

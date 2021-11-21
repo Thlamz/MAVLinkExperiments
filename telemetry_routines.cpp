@@ -4,23 +4,20 @@
 using namespace boost::asio;
 using boost::asio::ip::udp;
 
-void TelemetryRoutine::operator()(boost::system::error_code ec, std::size_t len) {
-    if(!ec) {
-        reenter(this) {
-            for(;;) {
-                    yield helper->socket.async_receive(buffer(*buf), *this);
+void TelemetryRoutine::operator()(boost::asio::yield_context yield) {
+    size_t len;
+    for(;;) {
+        len = helper->socket.async_receive(buffer(*buf), yield);
 
-                    mavlink_status_t status;
-                    mavlink_message_t msg;
+        mavlink_status_t status;
+        mavlink_message_t msg;
 
-                    for (int i = 0; i < len; ++i)
-                    {
-                        if (mavlink_parse_char(MAVLINK_COMM_0, (*buf)[i], &msg, &status))
-                        {
-                            helper->check_requirement(msg);
-                        }
-                    }
+        for (int i = 0; i < len; ++i)
+        {
+            if (mavlink_parse_char(MAVLINK_COMM_0, (*buf)[i], &msg, &status))
+            {
+                helper->check_requirement(msg);
             }
-        };
+        }
     }
 }

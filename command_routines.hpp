@@ -6,12 +6,26 @@
 
 #ifndef COMMAND_ROUTINES_HEADER
 #define COMMAND_ROUTINES_HEADER
-
+/**
+ * @brief Coroutine designed to send commands encoded in MAVLink messages to a MAVProxy endpoint
+ * 
+ */
 class MainCommandRoutine : public boost::asio::coroutine {
     public:
+        /**
+         * @brief Construct a new Main Command Routine object
+         * 
+         * @param mavlink_helper Instance of the MAVLinkHelper configured for communication with the MAVProxy endpoint
+         */
         MainCommandRoutine(std::shared_ptr<MAVLinkHelper>& mavlink_helper) : helper(mavlink_helper) {
             command_timeout = new boost::asio::steady_timer(helper->io);
         };
+        /**
+         * @brief Operation to start the coroutine. It will send a sequence of commands to the MAVProxy endpoint that will arm the vehicle and command it
+         * to takeoff to 25 meters.
+         * 
+         * @param yield Yield context of the coroutine
+         */
         void operator()(boost::asio::yield_context yield);
 
         /**
