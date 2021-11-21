@@ -1,10 +1,28 @@
 #include "message_checkers.hpp"
 #include <iostream>
+/**
+ * @brief This module contains message checkers that should be used as conditions for requirements.
+ * 
+ */
 
+
+
+/**
+ * @brief An empty checker, always immediatly resolves
+ * 
+ * @return true 
+ */
 bool check_empty(mavlink_message_t) {
     return true;
 }
 
+
+/**
+ * @brief Gets the check_cmd_ack message checker for a specific command
+ * 
+ * @param command The command you want to get the checker for
+ * @return Condition Returns true when command gets acknowledged
+ */
 Condition get_check_cmd_ack(uint16_t command) {
     return [command](mavlink_message_t message) {
         if(message.msgid = MAVLINK_MSG_ID_COMMAND_ACK) {
@@ -18,6 +36,13 @@ Condition get_check_cmd_ack(uint16_t command) {
     };
 }
 
+/**
+ * @brief Checks if the vehicle is ready to arm
+ * 
+ * @param message Telemetry recieved
+ * @return true If the vehicle is ready to arm
+ * @return false If the vehicle is not yet ready to arm 
+ */
 bool check_pre_arm(mavlink_message_t message) {
     uint16_t required_value = (EKF_ATTITUDE |
                 ESTIMATOR_VELOCITY_HORIZ |
@@ -38,6 +63,13 @@ bool check_pre_arm(mavlink_message_t message) {
     return false;
 }
 
+/**
+ * @brief Checks if the vehicle is armed
+ * 
+ * @param message Telemetry received
+ * @return true If the vehicle is armed
+ * @return false If the vehicle is not armed
+ */
 bool check_arm(mavlink_message_t message) {
     if(message.msgid == MAVLINK_MSG_ID_HEARTBEAT) {
         mavlink_heartbeat_t heartbeat;
@@ -47,6 +79,13 @@ bool check_arm(mavlink_message_t message) {
     return false;
 }
 
+/**
+ * @brief Gets a message checker that will verify if a vehicle is within tolerance of an altutude
+ * 
+ * @param altitude Target altitude
+ * @param tolerance Margin of error for the altitude
+ * @return Condition Message checker for that specific altitude and tolerance
+ */
 Condition get_check_altitude(int32_t altitude, int32_t tolerance) {
     return [=](mavlink_message_t msg) {
         if(msg.msgid == MAVLINK_MSG_ID_GLOBAL_POSITION_INT) {
