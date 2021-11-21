@@ -53,8 +53,9 @@ class MAVLinkHelper {
         uint8_t system_id;
         uint8_t component_id;
         boost::asio::io_context io;
-        boost::asio::ip::udp::resolver resolver = boost::asio::ip::udp::resolver(io);
         boost::asio::ip::udp::socket socket = boost::asio::ip::udp::socket(io);
+    protected:
+        boost::asio::ip::udp::resolver resolver = boost::asio::ip::udp::resolver(io);
         boost::asio::ip::udp::endpoint local_port;
         boost::asio::ip::udp::endpoint remote_port;
 

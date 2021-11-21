@@ -52,7 +52,7 @@ void MainCommandRoutine::operator()(boost::asio::yield_context yield) {
     cmd.target_system = 1;
     async_send_command(cmd, get_check_altitude(25, 2), yield);
 
-    std::cout << "DONE" << std::endl;
+    std::cout << "Command Routine DONE" << std::endl;
 }
 
 inline boost::system::error_code MainCommandRoutine::async_send_command(mavlink_command_long_t cmd, Condition requirement, boost::asio::yield_context yield, 
@@ -72,7 +72,7 @@ inline boost::system::error_code MainCommandRoutine::async_send_command(mavlink_
         }
 
         len = mavlink_msg_to_send_buffer(buf.data(), &msg);
-        len = helper->socket.async_send_to(buffer(buf, len), helper->remote_port, yield);
+        len = helper->socket.async_send(buffer(buf, len), yield);
         if(ec) {
             std::cout << "REQUEST FAILED" << std::endl;
             continue;

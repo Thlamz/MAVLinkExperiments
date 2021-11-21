@@ -13,6 +13,7 @@ MAVLinkHelper::MAVLinkHelper(uint8_t system_id, uint8_t component_id, int port) 
     std::cout << "Resolving port" << std::endl;
     boost::array<uint8_t, 256> array;
     socket.receive_from(buffer(array), remote_port);
+    socket.connect(remote_port);
 }
 MAVLinkHelper::~MAVLinkHelper() {
     socket.close();
