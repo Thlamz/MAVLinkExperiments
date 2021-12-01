@@ -28,7 +28,7 @@ Condition get_check_cmd_ack(uint16_t command) {
         if(message.msgid = MAVLINK_MSG_ID_COMMAND_ACK) {
             mavlink_command_ack_t ack;
             mavlink_msg_command_ack_decode(&message, &ack);
-            if(ack.command == command) {
+            if(ack.command == command && ack.result == MAV_RESULT_ACCEPTED) {
                 return true;
             }
         }

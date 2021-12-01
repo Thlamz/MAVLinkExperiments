@@ -14,10 +14,12 @@ void MainCommandRoutine::operator()(boost::asio::yield_context yield) {
     cmd = {};
     cmd.command = MAV_CMD_SET_MESSAGE_INTERVAL;
     cmd.confirmation = 0;
-    cmd.param1 = 10; // 10Hz
+    cmd.param1 = MAVLINK_MSG_ID_HEARTBEAT;
+    cmd.param2 = 10; // 10 Hz
+    cmd.param7 = 0;
     cmd.target_component = 1;
     cmd.target_system = 1;
-    async_send_command(cmd, check_empty, yield, 5, 3);
+    async_send_command(cmd, check_empty, yield, 15, 3);
 
     std::cout << "Sending GUIDED" << std::endl;
     // Sending MODE GUIDED command
@@ -28,7 +30,7 @@ void MainCommandRoutine::operator()(boost::asio::yield_context yield) {
     cmd.param2 = COPTER_MODE_GUIDED;
     cmd.target_component = 1;
     cmd.target_system = 1;
-    async_send_command(cmd, check_pre_arm, yield, 5, 3);
+    async_send_command(cmd, check_pre_arm, yield, 15, 3);
     
     std::cout << "Sending ARM THROTTLE" << std::endl;
     // Sending ARM THROTTLE command
@@ -38,7 +40,7 @@ void MainCommandRoutine::operator()(boost::asio::yield_context yield) {
     cmd.param1 = 1;
     cmd.target_component = 1;
     cmd.target_system = 1;
-    async_send_command(cmd, check_arm, yield, 5);
+    async_send_command(cmd, check_arm, yield, 15, 3);
 
 
 
@@ -50,7 +52,7 @@ void MainCommandRoutine::operator()(boost::asio::yield_context yield) {
     cmd.param7 = 25;
     cmd.target_component = 1;
     cmd.target_system = 1;
-    async_send_command(cmd, get_check_altitude(25, 2), yield);
+    async_send_command(cmd, get_check_altitude(25, 2), yield, 30);
 
     std::cout << "Command Routine DONE" << std::endl;
 }
